@@ -72,7 +72,7 @@ const buildCSS = async ({ isBundle, modules, minified }) => {
 
 async function buildStyles() {
   elapsed.start('styles');
-  const modules = config.modules.filter((name) => {
+  const modules = config.modulesCss.filter((name) => {
     const lessFilePath = `./src/modules/${name}/${name}.less`;
     return fs.existsSync(lessFilePath);
   });

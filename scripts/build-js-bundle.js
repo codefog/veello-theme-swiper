@@ -87,7 +87,7 @@ async function buildEntry(modules, format, browser = false) {
 async function buildJsBundle() {
   elapsed.start('bundle');
   const modules = [];
-  config.modules.forEach((name) => {
+  config.modulesJs.forEach((name) => {
     // eslint-disable-next-line
     const capitalized = name
       .split('-')

@@ -31,7 +31,7 @@ async function buildCore(modules) {
 async function build() {
   elapsed.start('core');
   const modules = [];
-  config.modules.forEach((name) => {
+  config.modulesJs.forEach((name) => {
     // eslint-disable-next-line
     const capitalized = name
       .split('-')
