@@ -2,10 +2,10 @@ module.exports = {
   modulesCss: [
     'a11y',
     'effect-coverflow',
-    'effect-cube',
-    'effect-flip',
-    'effect-coverflow',
     'effect-creative',
+    'effect-cube',
+    'effect-fade',
+    'effect-flip',
   ],
   modulesJs: [
     'keyboard',
@@ -17,10 +17,10 @@ module.exports = {
     'a11y',
     'hash-navigation',
     'autoplay',
-    'effect-fade',
-    'effect-cube',
-    'effect-flip',
     'effect-coverflow',
     'effect-creative',
+    'effect-cube',
+    'effect-fade',
+    'effect-flip',
   ],
 };
