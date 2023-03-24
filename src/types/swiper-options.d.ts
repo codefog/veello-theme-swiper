@@ -174,11 +174,11 @@ export interface SwiperOptions {
   uniqueNavElements?: boolean;
 
   /**
-   * Transition effect. Can be `'slide'`, `'fade'`, `'cube'`, `'coverflow'`, `'flip'` or `'custom'`
+   * Transition effect. Can be `'slide'`, `'fade'`, `'cube'`, `'coverflow'`, `'flip'` or `'creative'`
    *
    * @default 'slide'
    */
-  effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip' | 'custom';
+  effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip' | 'creative' | 'cards';
 
   /**
    * Fire Transition/SlideChange/Start/End events on swiper initialization.
@@ -259,7 +259,7 @@ export interface SwiperOptions {
    *
    * @default 0
    *
-   * @note If you use "margin" css property to the elements which go into Swiper in which you pass "spaceBetween" into, navigation might not work property.
+   * @note If you use "margin" css property to the elements which go into Swiper in which you pass "spaceBetween" into, navigation might not work properly.
    */
   spaceBetween?: number;
 
@@ -271,6 +271,15 @@ export interface SwiperOptions {
    * @default 1
    */
   slidesPerView?: number | 'auto';
+
+  /**
+   * If total number of slides less than specified here value, then Swiper will enable `backface-visibility: hidden` on slide elements to reduce visual "flicker" in Safari.
+   *
+   * @note It is not recommended to enable it on large amount of slides as it will reduce performance
+   *
+   * @default 10
+   */
+  maxBackfaceHiddenSlides?: number;
 
   /**
    * Set numbers of slides to define and enable group sliding. Useful to use with slidesPerView > 1
@@ -289,7 +298,7 @@ export interface SwiperOptions {
   slidesPerGroupSkip?: number;
 
   /**
-   * This param intended to be used only with `slidesPerView: 'auto' and `slidesPerGroup: 1`. When enabled, it will skip all slides in view on `.slideNext()` & `.slidePrev()` methods calls, on Navigation "buttons" clicks and in autoplay.
+   * This param intended to be used only with `slidesPerView: 'auto'` and `slidesPerGroup: 1`. When enabled, it will skip all slides in view on `.slideNext()` & `.slidePrev()` methods calls, on Navigation "buttons" clicks and in autoplay.
    *
    * @default false
    */
@@ -596,9 +605,18 @@ export interface SwiperOptions {
    *
    * @default false
    *
-   * @note If you use it along with `slidesPerView: 'auto'` then you need to specify `loopedSlides` parameter with amount of slides to loop (duplicate)
+   * @note If you use it along with `slidesPerView: 'auto'` then you need to specify `loopedSlides` parameter with amount of slides to loop (duplicate). Should not be used together with `rewind` mode
    */
   loop?: boolean;
+
+  /**
+   * Set to `true` to enable "rewind" mode. When enabled, clicking "next" navigation button (or calling `.slideNext()`) when on last slide will slide back to the first slide. Clicking "prev" navigation button (or calling `.slidePrev()`) when on first slide will slide forward to the last slide.
+   *
+   * @default false
+   *
+   * @note Should not be used together with `loop` mode
+   */
+  rewind?: boolean;
 
   /**
    * Addition number of slides that will be cloned after creating of loop
@@ -613,6 +631,13 @@ export interface SwiperOptions {
    * @default null
    */
   loopedSlides?: number | null;
+
+  /**
+   * When enabled then amount of duplicated slides will not exceed amount of original slides. Useful to disable and increase `loopedSlides` when you have a lot of slides per view and not sufficient amount of original slides
+   *
+   * @default true
+   */
+  loopedSlidesLimit?: boolean;
 
   /**
    * Enable and loop mode will fill groups with insufficient number of slides with blank slides. Good to be used with `slidesPerGroup` parameter
@@ -949,12 +974,12 @@ export interface SwiperOptions {
   flipEffect?: FlipEffectOptions;
 
   /**
-   * Object with Custom-effect parameters
+   * Object with Creative-effect parameters
    *
    * @example
    * ```js
    * const swiper = new Swiper('.swiper', {
-   *   effect: 'custom',
+   *   effect: 'creative',
    *   creativeEffect: {
    *     prev: {
    *       // will set `translateZ(-400px)` on previous slides

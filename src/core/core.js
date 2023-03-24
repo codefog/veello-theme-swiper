@@ -67,6 +67,7 @@ class Swiper {
         const newParams = extend({}, params, { el: containerEl });
         swipers.push(new Swiper(newParams));
       });
+      // eslint-disable-next-line no-constructor-return
       return swipers;
     }
 
@@ -79,10 +80,7 @@ class Swiper {
 
     swiper.eventsListeners = {};
     swiper.eventsAnyListeners = [];
-
-    if (typeof swiper.modules === 'undefined') {
-      swiper.modules = [];
-    }
+    swiper.modules = [...swiper.__modules__];
     if (params.modules && Array.isArray(params.modules)) {
       swiper.modules.push(...params.modules);
     }
@@ -230,6 +228,7 @@ class Swiper {
     }
 
     // Return app instance
+    // eslint-disable-next-line no-constructor-return
     return swiper;
   }
 
@@ -278,6 +277,7 @@ class Swiper {
 
   getSlideClasses(slideEl) {
     const swiper = this;
+    if (swiper.destroyed) return '';
 
     return slideEl.className
       .split(' ')
@@ -431,6 +431,21 @@ class Swiper {
     return swiper;
   }
 
+  changeLanguageDirection(direction) {
+    const swiper = this;
+    if ((swiper.rtl && direction === 'rtl') || (!swiper.rtl && direction === 'ltr')) return;
+    swiper.rtl = direction === 'rtl';
+    swiper.rtlTranslate = swiper.params.direction === 'horizontal' && swiper.rtl;
+    if (swiper.rtl) {
+      swiper.$el.addClass(`${swiper.params.containerModifierClass}rtl`);
+      swiper.el.dir = 'rtl';
+    } else {
+      swiper.$el.removeClass(`${swiper.params.containerModifierClass}rtl`);
+      swiper.el.dir = 'ltr';
+    }
+    swiper.update();
+  }
+
   mount(el) {
     const swiper = this;
     if (swiper.mounted) return true;
@@ -455,6 +470,9 @@ class Swiper {
         // Children needs to return slot items
         res.children = (options) => $el.children(options);
         return res;
+      }
+      if (!$el.children) {
+        return $($el).children(getWrapperSelector());
       }
       return $el.children(getWrapperSelector());
     };
@@ -626,8 +644,8 @@ class Swiper {
   }
 
   static installModule(mod) {
-    if (!Swiper.prototype.modules) Swiper.prototype.modules = [];
-    const modules = Swiper.prototype.modules;
+    if (!Swiper.prototype.__modules__) Swiper.prototype.__modules__ = [];
+    const modules = Swiper.prototype.__modules__;
 
     if (typeof mod === 'function' && modules.indexOf(mod) < 0) {
       modules.push(mod);

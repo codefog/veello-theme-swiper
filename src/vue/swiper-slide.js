@@ -1,5 +1,14 @@
-import { h, ref, onMounted, onUpdated, onBeforeUpdate, computed, onBeforeUnmount } from 'vue';
-import { uniqueClasses } from './utils.js';
+import {
+  h,
+  ref,
+  onMounted,
+  onUpdated,
+  onBeforeUpdate,
+  computed,
+  onBeforeUnmount,
+  provide,
+} from 'vue';
+import { uniqueClasses } from '../components-shared/utils.js';
 
 const SwiperSlide = {
   name: 'SwiperSlide',
@@ -8,7 +17,7 @@ const SwiperSlide = {
       type: String,
       default: 'div',
     },
-    swiperRef: Object,
+    swiperRef: { type: Object, required: false },
     zoom: { type: Boolean, default: undefined },
     virtualIndex: {
       type: [String, Number],
@@ -28,7 +37,7 @@ const SwiperSlide = {
     }
 
     onMounted(() => {
-      if (!swiperRef.value) return;
+      if (!swiperRef || !swiperRef.value) return;
       swiperRef.value.on('_slideClass', updateClasses);
       eventAttached = true;
     });
@@ -66,6 +75,7 @@ const SwiperSlide = {
         slideClasses.value.indexOf('swiper-slide-next') >= 0 ||
         slideClasses.value.indexOf('swiper-slide-duplicate-next') >= 0,
     }));
+    provide('swiperSlide', slideData);
     return () => {
       return h(
         props.tag,

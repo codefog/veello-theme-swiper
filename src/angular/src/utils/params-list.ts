@@ -1,6 +1,7 @@
 /* underscore in name -> watch for changes */
 export const paramsList = [
   'init',
+  'enabled',
   '_direction',
   'touchEventsTarget',
   'initialSlide',
@@ -25,9 +26,11 @@ export const paramsList = [
   'breakpoints',
   '_spaceBetween',
   '_slidesPerView',
+  'maxBackfaceHiddenSlides',
   '_grid',
   '_slidesPerGroup',
   '_slidesPerGroupSkip',
+  '_slidesPerGroupAuto',
   '_centeredSlides',
   '_centeredSlidesBounds',
   '_slidesOffsetBefore',
@@ -63,8 +66,10 @@ export const paramsList = [
   '_loop',
   '_loopAdditionalSlides',
   '_loopedSlides',
+  '_loopedSlidesLimit',
   '_loopFillGroupWithBlank',
   'loopPreventsSlide',
+  '_rewind',
   '_allowSlidePrev',
   '_allowSlideNext',
   '_swipeHandler',
@@ -111,4 +116,5 @@ export const paramsList = [
   '_thumbs',
   'virtual',
   'zoom',
+  'on',
 ];

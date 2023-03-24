@@ -1,17 +1,16 @@
 import { ChangeDetectorRef, Component, NgZone, ViewChild } from '@angular/core';
-import Swiper from 'dist/swiper';
 import { BehaviorSubject } from 'rxjs';
-import { SwiperComponent } from 'src/angular/src/public-api';
+import { EventsParams, SwiperComponent } from 'src/angular/src/public-api';
 import SwiperCore, {
+  A11y,
+  Autoplay,
+  Controller,
   Navigation,
   Pagination,
   Scrollbar,
-  A11y,
+  Thumbs,
   Virtual,
   Zoom,
-  Autoplay,
-  Thumbs,
-  Controller,
 } from 'swiper';
 
 SwiperCore.use([
@@ -31,6 +30,9 @@ SwiperCore.use([
   templateUrl: './home.component.html',
 })
 export class HomePage {
+  p1 = true;
+  p2 = false;
+  example = 'testClass2';
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
 
   show: boolean;
@@ -39,20 +41,29 @@ export class HomePage {
   constructor(private cd: ChangeDetectorRef, private ngZone: NgZone) {}
   ngOnInit() {}
 
+  testEvent(event: EventsParams['beforeTransitionStart']) {
+    const [swiper, speed, internal] = event;
+    console.log({ swiper, speed, internal });
+  }
+
   getSlides() {
     this.slides$.next(Array.from({ length: 600 }).map((el, index) => `Slide ${index + 1}`));
   }
 
-  thumbsSwiper: Swiper;
-  setThumbsSwiper(swiper: Swiper) {
+  enabled: boolean = false;
+  toggleEnabled() {
+    this.enabled = !this.enabled;
+  }
+
+  thumbsSwiper: SwiperCore;
+  setThumbsSwiper(swiper: SwiperCore) {
     this.thumbsSwiper = swiper;
   }
-  controlledSwiper: Swiper;
-  setControlledSwiper(swiper: Swiper) {
+  controlledSwiper: SwiperCore;
+  setControlledSwiper(swiper: SwiperCore) {
     this.controlledSwiper = swiper;
   }
 
-  indexNumber = 1;
   exampleConfig = { slidesPerView: 3 };
   slidesPerView: number = 4;
   pagination: any = false;
@@ -108,7 +119,8 @@ export class HomePage {
 
   slidesEx = ['first', 'second'];
 
-  onSlideChange(swiper: Swiper) {
+  onSlideChange(event: EventsParams['slideChange']) {
+    const [swiper] = event;
     if (swiper.isEnd) {
       // all swiper events are run outside of ngzone, so use ngzone.run or detectChanges to update the view.
       this.ngZone.run(() => {

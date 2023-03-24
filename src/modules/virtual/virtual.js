@@ -1,7 +1,7 @@
 import $ from '../../shared/dom.js';
 import { setCSSProperty } from '../../shared/utils.js';
 
-export default function Virtual({ swiper, extendParams, on }) {
+export default function Virtual({ swiper, extendParams, on, emit }) {
   extendParams({
     virtual: {
       enabled: false,
@@ -14,6 +14,8 @@ export default function Virtual({ swiper, extendParams, on }) {
       addSlidesAfter: 0,
     },
   });
+
+  let cssModeTimeout;
 
   swiper.virtual = {
     cache: {},
@@ -49,7 +51,10 @@ export default function Virtual({ swiper, extendParams, on }) {
       slidesGrid: previousSlidesGrid,
       offset: previousOffset,
     } = swiper.virtual;
-    swiper.updateActiveIndex();
+    if (!swiper.params.cssMode) {
+      swiper.updateActiveIndex();
+    }
+
     const activeIndex = swiper.activeIndex || 0;
 
     let offsetProp;
@@ -83,6 +88,7 @@ export default function Virtual({ swiper, extendParams, on }) {
       if (swiper.lazy && swiper.params.lazy.enabled) {
         swiper.lazy.load();
       }
+      emit('virtualUpdate');
     }
 
     if (previousFrom === from && previousTo === to && !force) {
@@ -90,6 +96,7 @@ export default function Virtual({ swiper, extendParams, on }) {
         swiper.slides.css(offsetProp, `${offset}px`);
       }
       swiper.updateProgress();
+      emit('virtualUpdate');
       return;
     }
     if (swiper.params.virtual.renderExternal) {
@@ -107,6 +114,8 @@ export default function Virtual({ swiper, extendParams, on }) {
       });
       if (swiper.params.virtual.renderExternalUpdate) {
         onRendered();
+      } else {
+        emit('virtualUpdate');
       }
       return;
     }
@@ -176,7 +185,10 @@ export default function Virtual({ swiper, extendParams, on }) {
         const $cachedEl = cache[cachedIndex];
         const cachedElIndex = $cachedEl.attr('data-swiper-slide-index');
         if (cachedElIndex) {
-          $cachedEl.attr('data-swiper-slide-index', parseInt(cachedElIndex, 10) + 1);
+          $cachedEl.attr(
+            'data-swiper-slide-index',
+            parseInt(cachedElIndex, 10) + numberOfNewSlides,
+          );
         }
         newCache[parseInt(cachedIndex, 10) + numberOfNewSlides] = $cachedEl;
       });
@@ -231,7 +243,14 @@ export default function Virtual({ swiper, extendParams, on }) {
   });
   on('setTranslate', () => {
     if (!swiper.params.virtual.enabled) return;
-    update();
+    if (swiper.params.cssMode && !swiper._immediateVirtual) {
+      clearTimeout(cssModeTimeout);
+      cssModeTimeout = setTimeout(() => {
+        update();
+      }, 100);
+    } else {
+      update();
+    }
   });
   on('init update resize', () => {
     if (!swiper.params.virtual.enabled) return;

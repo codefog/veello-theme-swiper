@@ -64,14 +64,7 @@ export default function slideTo(
   let snapIndex = skip + Math.floor((slideIndex - skip) / swiper.params.slidesPerGroup);
   if (snapIndex >= snapGrid.length) snapIndex = snapGrid.length - 1;
 
-  if ((activeIndex || params.initialSlide || 0) === (previousIndex || 0) && runCallbacks) {
-    swiper.emit('beforeSlideChangeStart');
-  }
-
   const translate = -snapGrid[snapIndex];
-
-  // Update progress
-  swiper.updateProgress(translate);
 
   // Normalize slideIndex
   if (params.normalizeSlideIndex) {
@@ -114,6 +107,13 @@ export default function slideTo(
     }
   }
 
+  if (slideIndex !== (previousIndex || 0) && runCallbacks) {
+    swiper.emit('beforeSlideChangeStart');
+  }
+
+  // Update progress
+  swiper.updateProgress(translate);
+
   let direction;
   if (slideIndex > activeIndex) direction = 'next';
   else if (slideIndex < activeIndex) direction = 'prev';
@@ -143,11 +143,13 @@ export default function slideTo(
       const isVirtual = swiper.virtual && swiper.params.virtual.enabled;
       if (isVirtual) {
         swiper.wrapperEl.style.scrollSnapType = 'none';
+        swiper._immediateVirtual = true;
       }
       wrapperEl[isH ? 'scrollLeft' : 'scrollTop'] = t;
       if (isVirtual) {
         requestAnimationFrame(() => {
           swiper.wrapperEl.style.scrollSnapType = '';
+          swiper._swiperImmediateVirtual = false;
         });
       }
     } else {
@@ -163,46 +165,39 @@ export default function slideTo(
     return true;
   }
 
+  swiper.setTransition(speed);
+  swiper.setTranslate(translate);
+  swiper.updateActiveIndex(slideIndex);
+  swiper.updateSlidesClasses();
+  swiper.emit('beforeTransitionStart', speed, internal);
+  swiper.transitionStart(runCallbacks, direction);
+
   if (speed === 0) {
-    swiper.setTransition(0);
-    swiper.setTranslate(translate);
-    swiper.updateActiveIndex(slideIndex);
-    swiper.updateSlidesClasses();
-    swiper.emit('beforeTransitionStart', speed, internal);
-    swiper.transitionStart(runCallbacks, direction);
     swiper.transitionEnd(runCallbacks, direction);
-  } else {
-    swiper.setTransition(speed);
-    swiper.setTranslate(translate);
-    swiper.updateActiveIndex(slideIndex);
-    swiper.updateSlidesClasses();
-    swiper.emit('beforeTransitionStart', speed, internal);
-    swiper.transitionStart(runCallbacks, direction);
-    if (!swiper.animating) {
-      swiper.animating = true;
-      if (!swiper.onSlideToWrapperTransitionEnd) {
-        swiper.onSlideToWrapperTransitionEnd = function transitionEnd(e) {
-          if (!swiper || swiper.destroyed) return;
-          if (e.target !== this) return;
-          swiper.$wrapperEl[0].removeEventListener(
-            'transitionend',
-            swiper.onSlideToWrapperTransitionEnd,
-          );
-          swiper.$wrapperEl[0].removeEventListener(
-            'webkitTransitionEnd',
-            swiper.onSlideToWrapperTransitionEnd,
-          );
-          swiper.onSlideToWrapperTransitionEnd = null;
-          delete swiper.onSlideToWrapperTransitionEnd;
-          swiper.transitionEnd(runCallbacks, direction);
-        };
-      }
-      swiper.$wrapperEl[0].addEventListener('transitionend', swiper.onSlideToWrapperTransitionEnd);
-      swiper.$wrapperEl[0].addEventListener(
-        'webkitTransitionEnd',
-        swiper.onSlideToWrapperTransitionEnd,
-      );
+  } else if (!swiper.animating) {
+    swiper.animating = true;
+    if (!swiper.onSlideToWrapperTransitionEnd) {
+      swiper.onSlideToWrapperTransitionEnd = function transitionEnd(e) {
+        if (!swiper || swiper.destroyed) return;
+        if (e.target !== this) return;
+        swiper.$wrapperEl[0].removeEventListener(
+          'transitionend',
+          swiper.onSlideToWrapperTransitionEnd,
+        );
+        swiper.$wrapperEl[0].removeEventListener(
+          'webkitTransitionEnd',
+          swiper.onSlideToWrapperTransitionEnd,
+        );
+        swiper.onSlideToWrapperTransitionEnd = null;
+        delete swiper.onSlideToWrapperTransitionEnd;
+        swiper.transitionEnd(runCallbacks, direction);
+      };
     }
+    swiper.$wrapperEl[0].addEventListener('transitionend', swiper.onSlideToWrapperTransitionEnd);
+    swiper.$wrapperEl[0].addEventListener(
+      'webkitTransitionEnd',
+      swiper.onSlideToWrapperTransitionEnd,
+    );
   }
 
   return true;

@@ -45,5 +45,12 @@ export default function slidePrev(speed = this.params.speed, runCallbacks = true
       prevIndex = Math.max(prevIndex, 0);
     }
   }
+  if (params.rewind && swiper.isBeginning) {
+    const lastIndex =
+      swiper.params.virtual && swiper.params.virtual.enabled && swiper.virtual
+        ? swiper.virtual.slides.length - 1
+        : swiper.slides.length - 1;
+    return swiper.slideTo(lastIndex, speed, runCallbacks, internal);
+  }
   return swiper.slideTo(prevIndex, speed, runCallbacks, internal);
 }

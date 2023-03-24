@@ -1,4 +1,54 @@
 <main>
+  <h6>Initial value true</h6>
+  <button (click)="p1 = !p1">{{ p1 ? 'hide' : 'show' }}</button>
+  <swiper [pagination]="p1" class="mySwiper">
+    <ng-template swiperSlide class="testClass1">Slide 1</ng-template
+    ><ng-template swiperSlide [ngClass]="example">Slide 2</ng-template
+    ><ng-template swiperSlide>Slide 3</ng-template><ng-template swiperSlide>Slide 4</ng-template
+    ><ng-template swiperSlide>Slide 5</ng-template><ng-template swiperSlide>Slide 6</ng-template
+    ><ng-template swiperSlide>Slide 7</ng-template><ng-template swiperSlide>Slide 8</ng-template
+    ><ng-template swiperSlide>Slide 9</ng-template>
+  </swiper>
+  <h6>Initial value false</h6>
+  <button (click)="p2 = !p2">{{ p2 ? 'hide' : 'show' }}</button>
+  <swiper [pagination]="p2" class="mySwiper">
+    <ng-template swiperSlide>Slide 1</ng-template><ng-template swiperSlide>Slide 2</ng-template
+    ><ng-template swiperSlide>Slide 3</ng-template><ng-template swiperSlide>Slide 4</ng-template
+    ><ng-template swiperSlide>Slide 5</ng-template><ng-template swiperSlide>Slide 6</ng-template
+    ><ng-template swiperSlide>Slide 7</ng-template><ng-template swiperSlide>Slide 8</ng-template
+    ><ng-template swiperSlide>Slide 9</ng-template>
+  </swiper>
+  <div>
+    dsa
+    <h4>Enable / disable</h4>
+    <swiper [enabled]="enabled" [pagination]="true">
+      <ng-template swiperSlide> test vertical 2 </ng-template>
+      <ng-template swiperSlide> test vertical 2 </ng-template>
+      <ng-template swiperSlide> test vertical 2 </ng-template>
+      <ng-template swiperSlide> test vertical 2 </ng-template>
+    </swiper>
+    <button (click)="toggleEnabled()">{{ enabled ? 'Disable' : 'Enable' }}</button>
+  </div>
+  <div>
+    <h4>data-swiper-autoplay</h4>
+    <swiper
+      (beforeTransitionStart)="testEvent($event)"
+      [loop]="true"
+      [autoHeight]="true"
+      [allowTouchMove]="false"
+      [autoplay]="{ delay: 1000, pauseOnMouseEnter: false, disableOnInteraction: false }"
+      [pagination]="{ clickable: true }"
+      [navigation]="true"
+    >
+      <ng-template data-swiper-autoplay="6000" swiperSlide> Slide 1 </ng-template>
+
+      <ng-template data-swiper-autoplay="10000" class="swiper-slide" swiperSlide>
+        Slide 2
+      </ng-template>
+
+      <ng-template data-swiper-autoplay="60000" swiperSlide> Slide 3 </ng-template>
+    </swiper>
+  </div>
   <div>
     <h4>Slide change</h4>
     <swiper direction="horizontal" (slideChange)="onSlideChange($event)">
@@ -85,7 +135,6 @@
       [breakpoints]="breakpoints"
       [scrollbar]="scrollbar"
       [loop]="true"
-      [(index)]="indexNumber"
       [pagination]="{ el: '.swiper-pagination.pagination-test' }"
     >
       <ng-container *ngIf="show">
@@ -105,11 +154,6 @@
     <button (click)="toggleScrollbar()">Toggle scrollbar</button>
     <button (click)="breakpointChange()">Breakpoint change</button>
     <button (click)="show = !show">Toggle show</button>
-    <button (click)="indexNumber = 0">0</button>
-    <button (click)="indexNumber = 3">3</button>
-    <button (click)="indexNumber = 5">5</button>
-    <button (click)="indexNumber = 6">6</button>
-    {{ indexNumber }}
 
     <swiper [config]="exampleConfig">
       <ng-template swiperSlide>Best slide ever 2</ng-template>

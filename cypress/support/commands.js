@@ -32,7 +32,7 @@ Cypress.Commands.add('getSlide', { prevSubject: 'optional' }, (subject, slideInd
 });
 
 Cypress.Commands.add('getSlideContains', { prevSubject: 'optional' }, (subject, content) => {
-  cy.get('.swiper').contains(content);
+  return cy.get('.swiper-slide').contains(content);
 });
 Cypress.Commands.add('getSlides', { prevSubject: 'optional' }, () => {
   return cy.get(`.swiper-slide`);
@@ -45,6 +45,11 @@ Cypress.Commands.add('getPaginationBullet', { prevSubject: 'optional' }, (subjec
   return cy.get(`.swiper-pagination-bullet:nth-child(${bulletIndex + 1})`);
 });
 
+Cypress.Commands.add('slideTo', { prevSubject: 'optional' }, (subject, slideIndex) => {
+  return cy.window().then((_window) => {
+    _window.swiperRef.slideTo(slideIndex);
+  });
+});
 Cypress.Commands.add(
   'initSwiper',
   { prevSubject: 'optional' },
@@ -131,16 +136,10 @@ Cypress.Commands.add(
   },
 );
 
-Cypress.Commands.add(
-  'reinitSwiper',
-  { prevSubject: 'optional' },
-  (subject, config = {}, options) => {
-    return cy.window().then((_window) => {
-      _window.swiperRef.destroy();
-      cy.initSwiper(config, options);
-    });
-  },
-);
+Cypress.Commands.add('reinitSwiper', { prevSubject: 'optional' }, (subject, config = {}) => {
+  cy.reload();
+  cy.initSwiper(config);
+});
 
 Cypress.Commands.add('injectStyles', { prevSubject: 'optional' }, (subject, cssStyles = ``) => {
   return cy.document().then((_document) => {

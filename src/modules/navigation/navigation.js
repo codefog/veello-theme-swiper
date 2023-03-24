@@ -11,6 +11,7 @@ export default function Navigation({ swiper, extendParams, on, emit }) {
       disabledClass: 'swiper-button-disabled',
       hiddenClass: 'swiper-button-hidden',
       lockClass: 'swiper-button-lock',
+      navigationDisabledClass: 'swiper-navigation-disabled',
     },
   });
 
@@ -52,18 +53,20 @@ export default function Navigation({ swiper, extendParams, on, emit }) {
     if (swiper.params.loop) return;
     const { $nextEl, $prevEl } = swiper.navigation;
 
-    toggleEl($prevEl, swiper.isBeginning);
-    toggleEl($nextEl, swiper.isEnd);
+    toggleEl($prevEl, swiper.isBeginning && !swiper.params.rewind);
+    toggleEl($nextEl, swiper.isEnd && !swiper.params.rewind);
   }
   function onPrevClick(e) {
     e.preventDefault();
-    if (swiper.isBeginning && !swiper.params.loop) return;
+    if (swiper.isBeginning && !swiper.params.loop && !swiper.params.rewind) return;
     swiper.slidePrev();
+    emit('navigationPrev');
   }
   function onNextClick(e) {
     e.preventDefault();
-    if (swiper.isEnd && !swiper.params.loop) return;
+    if (swiper.isEnd && !swiper.params.loop && !swiper.params.rewind) return;
     swiper.slideNext();
+    emit('navigationNext');
   }
   function init() {
     const params = swiper.params.navigation;
@@ -114,8 +117,13 @@ export default function Navigation({ swiper, extendParams, on, emit }) {
   }
 
   on('init', () => {
-    init();
-    update();
+    if (swiper.params.navigation.enabled === false) {
+      // eslint-disable-next-line
+      disable();
+    } else {
+      init();
+      update();
+    }
   });
   on('toEdge fromEdge lock unlock', () => {
     update();
@@ -167,7 +175,20 @@ export default function Navigation({ swiper, extendParams, on, emit }) {
     }
   });
 
+  const enable = () => {
+    swiper.$el.removeClass(swiper.params.navigation.navigationDisabledClass);
+    init();
+    update();
+  };
+
+  const disable = () => {
+    swiper.$el.addClass(swiper.params.navigation.navigationDisabledClass);
+    destroy();
+  };
+
   Object.assign(swiper.navigation, {
+    enable,
+    disable,
     update,
     init,
     destroy,
